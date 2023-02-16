@@ -4,6 +4,7 @@
     {{ range where .Site.RegularPages "Type" "posts" }}
       <li>
         <a href="{{ .Permalink }}">{{ .Title }}</a>
+        <span>{{ .Date.Format "January 2, 2006" }}</span>
         {{ if .Params.summary }}
           <p>{{ .Params.summary }}</p>
         {{ end }}
