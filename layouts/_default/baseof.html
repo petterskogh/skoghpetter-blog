@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ .Site.Title }} - {{ .Page.Title }}</title>
+  
+  {{ $opts := (dict "transpiler" "libsass" "outputStyle" "compressed") }}
+  {{ if eq hugo.Environment "development" }}
+    {{ $opts = (dict "transpiler" "libsass" "enableSourceMap" true) }}
+  {{ end }}
+
+  {{ $style := resources.Get "sass/main.scss" }}
+  {{ $style = $style | toCSS $opts }}
+
+  <link rel="stylesheet" href="{{ $style.RelPermalink }}">
+</head>
+<body>
+  <main>
+    {{ block "main" . }}{{ end }}
+  </main>
+  <script src='{{ "js/code.js" | relURL }}'></script>
+</body>
+</html>

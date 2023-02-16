@@ -1,0 +1,13 @@
+{{ define "main" }}
+  <h1>{{ .Page.Title }}</h1>
+  <ul class="posts">
+    {{ range where .Site.RegularPages "Type" "posts" }}
+      <li>
+        <a href="{{ .Permalink }}">{{ .Title }}</a>
+        {{ if .Params.summary }}
+          <p>{{ .Params.summary }}</p>
+        {{ end }}
+      </li>
+    {{ end }}
+  </ul>
+{{ end  }}

@@ -1,0 +1,13 @@
+{{ define "main" }}
+  <article>
+    <div class="heading">
+      <div class="summary">
+        <h1>{{ .Page.Title }}</h1>
+        <span class="date">{{ .Date.Format "January 2, 2006" }}</span>
+      </div>
+      <a href="/">Back</a>
+    </div>
+    <p class="preamble">{{ .Params.summary }}</p>
+    {{ .Content }}
+  </article>
+{{ end }}
