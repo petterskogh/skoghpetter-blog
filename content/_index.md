@@ -1,3 +1,3 @@
 ---
-title: Petter Skogh
+title: Petter Skogh | Dev and Design
 ---

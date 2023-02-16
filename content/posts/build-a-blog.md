@@ -187,3 +187,16 @@ And then define it in the pages you want to add it, for example *single.html*. J
       <script src='{{ "js/single.js" | relURL }}'></script>
     {{ end }}
 
+## Summary
+
+To summarize what we have learned:
+
+- Create a new site with `hugo new site [sitename]`
+- Inside the layout directory, add the pages *baseof.html*, *list.html* and *single.html* to define the html structure of your site
+- Add markdown files inside the content folder to define the content of the page
+  - Add *_index.md* to define the base page (connected to list.html)
+  - Add other markdown files to define the other pages (connected to single.html)
+
+## Other resources
+
+I found this lesson series very helpful when I started creating my first Hugo site: [20 Minute Hugo](https://www.youtube.com/watch?v=u53xfby0EYI&list=PLbWvcwWtuDm1OpcbohZTOwwzmc8SMmlBD)
