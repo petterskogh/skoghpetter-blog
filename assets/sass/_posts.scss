@@ -1,4 +1,27 @@
 .posts {
   list-style: none;
   padding: 0;
+  
+  li {
+    .date {
+      margin-left: $small-spacing;
+      font-size: $font-size-s;
+      color: $color-grey;
+    }
+
+    p {
+      margin-top: $small-spacing;
+
+      padding-left: $standard-spacing;
+      border-left: 1px solid $color-grey;
+
+      color: $color-grey;
+    }
+
+    &:hover, a:focus-visible {
+      p, ~ p {
+        color: $foreground-main;
+      }
+    }
+  }
 }
