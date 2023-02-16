@@ -1,0 +1,89 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><title>Petter Skogh Blog - Build a blog with Hugo</title><link rel=stylesheet href=/skoghpetter-blog/sass/main.css></head><body><main><article><div class=heading><div class=summary><h1>Build a blog with Hugo</h1><span class=date>February 11, 2023</span></div><a href=/>Back</a></div><p class=preamble>Creating a blog from scratch can be an exciting and rewarding experience. In this post, we'll explore how to create a blog using the Hugo static site generator. Hugo is a popular open-source tool that makes it easy to build fast, reliable, and flexible websites. Whether you're a beginner or an experienced web developer, you'll find that creating a blog with Hugo is a great way to get started with static site generation. So, let's get started!</p><h2 id=get-started->Get started 🐣</h2><p>Hugo is built on Go and uses Go for its templating language so before you get started make sure you have Go installed. You can install it <a href=https://go.dev/doc/install>here</a>.</p><p>You can install Hugo using chocolatey (check out the <a href=https://gohugo.io/installation/>installation page</a>):</p><pre><code>choco install hugo-extended
+</code></pre><p>To check that it was correctly installed you can run <code>hugo version</code>. Then to create the blog, run:</p><pre><code>hugo new site blog
+</code></pre><h2 id=directories>Directories</h2><p>In a Hugo project, the file structure is organized into a series of directories that each have a specific purpose. Understanding these directories and their purpose is key to effectively using Hugo to create and maintain your website. In this section, we&rsquo;ll take a look at the typical directories you&rsquo;ll find in a Hugo project and what each of them is used for.</p><ul><li>📜 <strong>content</strong><ul><li>Contains all of the content for your Hugo site, organized into subdirectories by content type.</li><li>Here we will create a subdirectory <em>posts</em> for all your blog posts. This will add them to under the url <em>/posts/[post-name]</em></li></ul></li><li>🧬 <strong>layouts</strong><ul><li>Contains the templates that define the layout of your Hugo site. The templates in this directory control how the content in your content directory is displayed on your site.</li><li>We will use layouts to define the layout of the page that lists the blog posts as well as the blog posts themselves</li></ul></li><li>🌃 <strong>assets</strong><ul><li>Used to store source files for your site&rsquo;s assets, which are processed and output to the public directory when your Hugo site is built.</li><li>We will add our sass files here when we start styling the blog</li></ul></li><li>⚡ <strong>static</strong> (Can be ignored for now)<ul><li>Contains static files that are used by your Hugo site. Compared to the <em>resources</em> folder these files are not processed but directly copied to the public directory when your Hugo site is built and do not undergo any processing.</li></ul></li><li>🎒 <strong>resources</strong> (Can be ignored for now)<ul><li>Contains the source files for your site&rsquo;s assets, such as images, stylesheets, and JavaScript files. The assets in this directory are processed and output to the public directory when your Hugo site is built.</li></ul></li><li>🧑‍🤝‍🧑 <strong>public</strong> (Can be ignored for now)<ul><li>Contains the generated HTML files for your Hugo site. This is the directory that you&rsquo;ll serve to your visitors when your site is live.</li></ul></li><li>🔱 <strong>archetypes</strong> (Can be ignored for now)<ul><li>Contains default templates that are used to create new content. The templates in this directory define the structure and format of new content that is created in your Hugo site.</li></ul></li><li>💽 <strong>data</strong> (Can be ignored for now)<ul><li>Used to store data files that are used by your Hugo site. The data files can be written in JSON, YAML, or TOML format, and can be used to store information such as site metadata, configuration settings, and custom variables.</li></ul></li></ul><h2 id=create-the-base-layout---baseofhtml>Create the base layout - <em>baseof.html</em></h2><p>The first thing you have to do is create a baseof.html file in a directory called _default inside the layouts folder, that is <code>layouts/_default/baseof.html</code>. This file is used as the main layout for all your pages, hence you can put content inside the head and footer here.</p><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;{{ .Site.Title }} | {{ .Page.Title }}&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;main&gt;
+    {{ block &quot;main&quot; . }}{{ end }}
+  &lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>.Site contains information about global settings of the site. The global settings are contained in a file called <em>config.toml</em>. Toml is a configuration language like yaml, and if you&rsquo;re more comfortable with yaml you can even swap it to be a yaml file. The file contains an attribute called <em>title</em> that we use here.</p><p>.Page contains information about the page you are currently viewing. .Page grabs info from the markdown files that define your pages. They could hold any number of information but a couple of standard ones are Title and Date.</p><p><code>{{ block "main" . }}</code> will output any content on the page layouts that is defined with <code>{{ define "main" }}</code>. You could add other blocks, as for example a <em>head</em> block in the head section and then define special meta data inside each page.</p><h2 id=create-page-layouts>Create page layouts</h2><p>There are any number of different layouts you could create for different types of pages. For this blog example we will create two standard page types, <em>list.html</em> and <em>single.html</em>. List.html is the layout for the page that lists all of your blog posts. Single.html is the layout for the page of each individual blog post. Lets start by looking at list.html.</p><pre><code>{{ define &quot;main&quot; }}
+  &lt;h1&gt;{{ .Page.Title }}&lt;/h1&gt;
+  &lt;ul&gt;
+    {{ range where .Site.RegularPages &quot;Type&quot; &quot;posts&quot; }}
+      &lt;li&gt;
+        &lt;a href=&quot;{{ .Permalink }}&quot;&gt;{{ .Title }}&lt;/a&gt;
+        &lt;span&gt;{{ .Date.Format &quot;January 2, 2006&quot; }}&lt;/span&gt;
+        {{ if .Params.summary }}
+          &lt;p&gt;{{ .Params.summary }}&lt;/p&gt;
+        {{ end }}
+      &lt;/li&gt;
+    {{ end }}
+  &lt;/ul&gt;
+{{ end  }}
+</code></pre><p>Here we start by wrapping everything in <em>&ldquo;define main&rdquo;</em> which will put the content inside the body of the baseof layout. As discussed earlier Page.Title is the title of the page defined in the list page&rsquo;s corresponding markdown file. After the heading we create a list of all the posts. <code>{{ range where .Site.RegularPages "Type" "posts" }}</code> will loop over all files in a folder that we have named <em>posts</em>. All of the parameters that we get inside this range will point to information in the post that we are currently looping through, if we dont explicitly say otherwise.</p><p>Permalink is an automatically generated attribute that will give you the relative path to the page based on the folder structure, so in this case it could be something like <em>/posts/first-blog-post</em>. Permalink, Title and Date are standard parameters of a page. Params.summary however is a custom property that we have defined inside our blog posts. All custom properties that we define can be retrieved from Params.</p><p>The next layout we&rsquo;re going to create is the single.html file.</p><pre><code>{{ define &quot;main&quot; }}
+  &lt;article&gt;
+    &lt;h1&gt;{{ .Title }}&lt;/h1&gt;
+    &lt;span&gt;{{ .Date.Format &quot;January 2, 2006&quot; }}&lt;/span&gt;
+    &lt;a href=&quot;/&quot;&gt;Back&lt;/a&gt;
+    &lt;p class=&quot;preamble&quot;&gt;{{ .Params.summary }}&lt;/p&gt;
+    {{ .Content }}
+  &lt;/article&gt;
+{{ end }}
+</code></pre><p>Here we basically display the same information as in the list but with one difference, <em>Content</em>. Content will display the markdown text from the posts that we create.</p><h2 id=add-content>Add content</h2><p>At this stage you can start adding the content. In the content folder add the file <em>_index.md</em>. This will serve as the base page that lists all the blog posts. By naming conventions this file will be linked to the <em>list.html</em> file we created earlier so all you have to do in this file is add the title for the page.</p><pre><code>---
+title: The life of an avocado lover
+---
+</code></pre><p>The content inside the tripple dashes is the <em>front matter</em>. This is where we put content like title, date and other parameters that we define.</p><p>Next we will start adding posts so that we can see some content. Add a new folder called <em>posts</em> inside the content folder. Then add a post with a name of your choosing. Add the following:</p><pre><code>---
+title: &quot;Avocados are the best 🥑&quot;
+date: 2023-02-11
+summary: &quot;Avocados are the best. They are tasty, cute and fun!&quot;
+---
+
+## Majestic avocados of history
+
+Avocados have been bringing their tastiness to the world for a long time.
+</code></pre><p>Here we have the front matter that we have talked about before with title, date and summary. After the front matter you can start adding any amount of markdown to create your blog post.</p><p>And there you go, now you can launch your blog with:</p><pre><code>hugo server
+</code></pre><h2 id=add-styling>Add styling</h2><p>We have a blog with content, but it looks awfully boring without some styling. You can add this as normal CSS but I think <a href=https://sass-lang.com/>SASS</a> makes life much more enjoyable. To add sass simply create your entry sass file in <em>assets/sass</em> and add the following to your <em>baseof.html</em> file:</p><pre><code>&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;{{ .Site.Title }} - {{ .Page.Title }}&lt;/title&gt;
+
+  {{ $style := resources.Get &quot;sass/main.scss&quot; }}
+  {{ $style = $style | toCSS }}
+
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;{{ $style.RelPermalink }}&quot;&gt;
+&lt;/head&gt;
+</code></pre><p>If you want to for example enable source map and make other adjustments to how the css is generated, you can add options like so:</p><pre><code>&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;{{ .Site.Title }} - {{ .Page.Title }}&lt;/title&gt;
+  
+  {{ $opts := (dict &quot;transpiler&quot; &quot;libsass&quot; &quot;outputStyle&quot; &quot;compressed&quot;) }}
+  {{ if eq hugo.Environment &quot;development&quot; }}
+    {{ $opts = (dict &quot;transpiler&quot; &quot;libsass&quot; &quot;enableSourceMap&quot; true) }}
+  {{ end }}
+
+  {{ $style := resources.Get &quot;sass/main.scss&quot; }}
+  {{ $style = $style | toCSS $opts }}
+
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;{{ $style.RelPermalink }}&quot;&gt;
+&lt;/head&gt;
+</code></pre><p>Feel free to add whatever styling you want! And remember to update the layout html to get working the way you want it.</p><h2 id=adding-javascript>Adding JavaScript</h2><p>If you want any JavaScript functionality, you can add a js file to <em>static/js</em> (choose whatever folder name you want). Add it to the page by linking it at the bottom of the body in you <em>baseof.html</em> file.</p><pre><code>&lt;body&gt;
+  &lt;main&gt;
+    {{ block &quot;main&quot; . }}{{ end }}
+  &lt;/main&gt;
+  &lt;script src='{{ &quot;js/main.js&quot; | relURL }}'&gt;&lt;/script&gt;
+&lt;/body&gt;
+</code></pre><p>If you want to make it more adjustable you can a new block, like so:</p><pre><code>&lt;body&gt;
+  &lt;main&gt;
+    {{ block &quot;main&quot; . }}{{ end }}
+  &lt;/main&gt;
+  {{ block &quot;includes&quot; . }}{{ end }}
+&lt;/body&gt;
+</code></pre><p>And then define it in the pages you want to add it, for example <em>single.html</em>. Just add:</p><pre><code>{{ define &quot;includes&quot; }}
+  &lt;script src='{{ &quot;js/single.js&quot; | relURL }}'&gt;&lt;/script&gt;
+{{ end }}
+</code></pre><h2 id=summary>Summary</h2><p>To summarize what we have learned:</p><ul><li>Create a new site with <code>hugo new site [sitename]</code></li><li>Inside the layout directory, add the pages <em>baseof.html</em>, <em>list.html</em> and <em>single.html</em> to define the html structure of your site</li><li>Add markdown files inside the content folder to define the content of the page<ul><li>Add <em>_index.md</em> to define the base page (connected to list.html)</li><li>Add other markdown files to define the other pages (connected to single.html)</li></ul></li></ul><h2 id=other-resources>Other resources</h2><p>I found this lesson series very helpful when I started creating my first Hugo site: <a href="https://www.youtube.com/watch?v=u53xfby0EYI&list=PLbWvcwWtuDm1OpcbohZTOwwzmc8SMmlBD">20 Minute Hugo</a></p></article></main><script src=/skoghpetter-blog/js/code.js></script></body></html>
