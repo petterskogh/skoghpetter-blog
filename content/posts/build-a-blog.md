@@ -4,7 +4,7 @@ date: 2023-02-11
 summary: "Creating a blog from scratch can be an exciting and rewarding experience. In this post, we'll explore how to create a blog using the Hugo static site generator. Hugo is a popular open-source tool that makes it easy to build fast, reliable, and flexible websites. Whether you're a beginner or an experienced web developer, you'll find that creating a blog with Hugo is a great way to get started with static site generation. So, let's get started!"
 ---
 
-## Get started
+## Get started 🐣
 
 Hugo is built on Go and uses Go for its templating language so before you get started make sure you have Go installed. You can install it [here](https://go.dev/doc/install).
 
@@ -69,10 +69,11 @@ There are any number of different layouts you could create for different types o
 
     {{ define "main" }}
       <h1>{{ .Page.Title }}</h1>
-      <ul class="posts">
+      <ul>
         {{ range where .Site.RegularPages "Type" "posts" }}
           <li>
             <a href="{{ .Permalink }}">{{ .Title }}</a>
+            <span>{{ .Date.Format "January 2, 2006" }}</span>
             {{ if .Params.summary }}
               <p>{{ .Params.summary }}</p>
             {{ end }}
@@ -81,23 +82,108 @@ There are any number of different layouts you could create for different types o
       </ul>
     {{ end  }}
 
-Here we start by wrapping everything in *"define main"* which will put the content inside the body of the baseof layout. As discussed earlier .Page.Title is the title of the page defined in the list page's corresponding markdown file. We then create a list of all the posts. `{{ range where .Site.RegularPages "Type" "posts" }}` will loop over all files in a folder that we have named *posts*. All of the parameters that we get inside this range will point to information in the post that we are currently looping through, if we dont explicitly say otherwise. 
+Here we start by wrapping everything in *"define main"* which will put the content inside the body of the baseof layout. As discussed earlier Page.Title is the title of the page defined in the list page's corresponding markdown file. After the heading we create a list of all the posts. `{{ range where .Site.RegularPages "Type" "posts" }}` will loop over all files in a folder that we have named *posts*. All of the parameters that we get inside this range will point to information in the post that we are currently looping through, if we dont explicitly say otherwise. 
 
-.Permalink is a standard attribute that will give you the relative path to the page based on the folder structure, so in this case it could be something like */posts/first-blog-post*. Both .Permalink and .Title are standard parameters of a page. .Params.summary however is a custom property that we have defined inside our blog posts. All custom properties that we define can be retrieved from .Params.
+Permalink is an automatically generated attribute that will give you the relative path to the page based on the folder structure, so in this case it could be something like */posts/first-blog-post*. Permalink, Title and Date are standard parameters of a page. Params.summary however is a custom property that we have defined inside our blog posts. All custom properties that we define can be retrieved from Params.
 
 The next layout we're going to create is the single.html file.
 
     {{ define "main" }}
       <article>
-        <div class="heading">
-          <div class="summary">
-            <h1>{{ .Page.Title }}</h1>
-            <span class="date">{{ .Date.Format "January 2, 2006" }}</span>
-          </div>
-          <a href="/">Back</a>
-        </div>
+        <h1>{{ .Title }}</h1>
+        <span>{{ .Date.Format "January 2, 2006" }}</span>
+        <a href="/">Back</a>
         <p class="preamble">{{ .Params.summary }}</p>
         {{ .Content }}
       </article>
+    {{ end }}
+
+Here we basically display the same information as in the list but with one difference, *Content*. Content will display the markdown text from the posts that we create.
+
+## Add content
+
+At this stage you can start adding the content. In the content folder add the file *_index.md*. This will serve as the base page that lists all the blog posts. By naming conventions this file will be linked to the *list.html* file we created earlier so all you have to do in this file is add the title for the page.
+
+    ---
+    title: The life of an avocado lover
+    ---
+
+The content inside the tripple dashes is the *front matter*. This is where we put content like title, date and other parameters that we define.
+
+Next we will start adding posts so that we can see some content. Add a new folder called *posts* inside the content folder. Then add a post with a name of your choosing. Add the following:
+
+    ---
+    title: "Avocados are the best 🥑"
+    date: 2023-02-11
+    summary: "Avocados are the best. They are tasty, cute and fun!"
+    ---
+
+    ## Majestic avocados of history
+
+    Avocados have been bringing their tastiness to the world for a long time.
+
+Here we have the front matter that we have talked about before with title, date and summary. After the front matter you can start adding any amount of markdown to create your blog post.
+
+And there you go, now you can launch your blog with:
+
+    hugo server
+
+## Add styling
+
+We have a blog with content, but it looks awfully boring without some styling. You can add this as normal CSS but I think [SASS](https://sass-lang.com/) makes life much more enjoyable. To add sass simply create your entry sass file in *assets/sass* and add the following to your *baseof.html* file:
+
+    <head>
+      <meta charset="UTF-8">
+      <title>{{ .Site.Title }} - {{ .Page.Title }}</title>
+
+      {{ $style := resources.Get "sass/main.scss" }}
+      {{ $style = $style | toCSS }}
+
+      <link rel="stylesheet" href="{{ $style.RelPermalink }}">
+    </head>
+
+If you want to for example enable source map and make other adjustments to how the css is generated, you can add options like so:
+
+    <head>
+      <meta charset="UTF-8">
+      <title>{{ .Site.Title }} - {{ .Page.Title }}</title>
+      
+      {{ $opts := (dict "transpiler" "libsass" "outputStyle" "compressed") }}
+      {{ if eq hugo.Environment "development" }}
+        {{ $opts = (dict "transpiler" "libsass" "enableSourceMap" true) }}
+      {{ end }}
+
+      {{ $style := resources.Get "sass/main.scss" }}
+      {{ $style = $style | toCSS $opts }}
+
+      <link rel="stylesheet" href="{{ $style.RelPermalink }}">
+    </head>
+
+Feel free to add whatever styling you want! And remember to update the layout html to get working the way you want it.
+
+## Adding JavaScript
+
+If you want any JavaScript functionality, you can add a js file to *static/js* (choose whatever folder name you want). Add it to the page by linking it at the bottom of the body in you *baseof.html* file.
+
+    <body>
+      <main>
+        {{ block "main" . }}{{ end }}
+      </main>
+      <script src='{{ "js/main.js" | relURL }}'></script>
+    </body>
+
+If you want to make it more adjustable you can a new block, like so:
+
+    <body>
+      <main>
+        {{ block "main" . }}{{ end }}
+      </main>
+      {{ block "includes" . }}{{ end }}
+    </body>
+
+And then define it in the pages you want to add it, for example *single.html*. Just add:
+
+    {{ define "includes" }}
+      <script src='{{ "js/single.js" | relURL }}'></script>
     {{ end }}
 
