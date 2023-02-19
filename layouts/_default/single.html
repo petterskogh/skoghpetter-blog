@@ -5,7 +5,7 @@
         <h1>{{ .Title }}</h1>
         <span class="date">{{ .Date.Format "January 2, 2006" }}</span>
       </div>
-      <a href="/">Back</a>
+      <a href='{{ .Site.BaseURL }}'>Back</a>
     </div>
     <p class="preamble">{{ .Params.summary }}</p>
     {{ .Content }}
