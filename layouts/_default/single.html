@@ -7,7 +7,12 @@
       </div>
       <a href='{{ .Site.BaseURL }}'>Back</a>
     </div>
+    
     <p class="preamble">{{ .Params.summary }}</p>
+    
+    <h2>Contents</h2>
+    {{ .TableOfContents }}
+
     {{ .Content }}
   </article>
 {{ end }}

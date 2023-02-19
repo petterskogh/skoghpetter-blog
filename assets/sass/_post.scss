@@ -37,6 +37,20 @@ article {
     font-style: italic;
   }
 
+  h2 {
+    margin-top: $large-spacing;
+  }
+
+  #TableOfContents {
+    ul {
+      list-style: number;
+
+      li {
+        margin-bottom: $small-spacing;
+      }
+    }
+  }
+
   ul {
     li {
       margin-bottom: $standard-spacing;

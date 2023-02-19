@@ -200,3 +200,7 @@ To summarize what we have learned:
 ## Other resources
 
 I found this lesson series very helpful when I started creating my first Hugo site: [20 Minute Hugo](https://www.youtube.com/watch?v=u53xfby0EYI&list=PLbWvcwWtuDm1OpcbohZTOwwzmc8SMmlBD)
+
+## Getting the site published on github pages
+
+Check out [this documentation](https://gohugo.io/hosting-and-deployment/hosting-on-github/) to learn how to publish your Hugo site on Github Pages.
